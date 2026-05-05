@@ -1,4 +1,4 @@
-# Discord VC Mic Maximizer (Firefox / Android-compatible WebExtension)
+# OMNI VC Mic Maximizer (Firefox / Android-compatible WebExtension)
 
 This extension injects into Discord Web and wraps microphone capture (`getUserMedia`) with:
 - gain boost,
