@@ -1,27 +1,59 @@
-const EXT = globalThis.browser ?? globalThis.chrome;
-
 (() => {
+  const EXT = globalThis.browser ?? globalThis.chrome;
+  const HAS_PROMISE_API = typeof globalThis.browser !== "undefined" && EXT === globalThis.browser;
+
+  function storageGet(key) {
+    if (HAS_PROMISE_API) return EXT.storage.local.get(key);
+    return new Promise((resolve) => {
+      try {
+        EXT.storage.local.get(key, (res) => {
+          if (EXT.runtime?.lastError) resolve({});
+          else resolve(res || {});
+        });
+      } catch {
+        resolve({});
+      }
+    });
+  }
+
+  function sendMessage(message) {
+    if (HAS_PROMISE_API) return EXT.runtime.sendMessage(message);
+    return new Promise((resolve) => {
+      try {
+        EXT.runtime.sendMessage(message, () => resolve(!EXT.runtime?.lastError));
+      } catch {
+        resolve(false);
+      }
+    });
+  }
+
   const DEFAULTS = {
     enabled: true,
-    gainDb: 45,
-    thresholdDb: -36,
-    knee: 28,
-    ratio: 18,
-    attack: 0.001,
-    release: 0.14,
-    lowShelfDb: 3,
-    presenceDb: 10,
-    highShelfDb: 10,
-    limiterDb: -4,
-    drive: 0.75,
-    loudness: 20.0
+    gainDb: 18,
+    thresholdDb: -30,
+    knee: 26,
+    ratio: 10,
+    attack: 0.002,
+    release: 0.16,
+    lowShelfDb: 2,
+    presenceDb: 5,
+    highShelfDb: 4,
+    limiterDb: -3,
+    drive: 0.18,
+    loudness: 2.5,
+    maxBoost: 500
   };
 
   const MSG_CFG = "MIC_MAXIMIZER_CONFIG";
+  let hookReady = false;
+
+  function heartbeat() {
+    if (hookReady) sendMessage({ type: "MICMAX_HEARTBEAT" }).catch(() => {});
+  }
 
   async function loadConfig() {
     try {
-      const res = await EXT.storage.local.get("micMaximizerConfig");
+      const res = await storageGet("micMaximizerConfig");
       return { ...DEFAULTS, ...(res.micMaximizerConfig || {}) };
     } catch {
       return { ...DEFAULTS };
@@ -35,7 +67,11 @@ const EXT = globalThis.browser ?? globalThis.chrome;
   async function sync() { pushConfig(await loadConfig()); }
 
   window.addEventListener("message", (e) => {
-    if (e.source === window && e.data?.type === "MIC_MAXIMIZER_READY") sync();
+    if (e.source === window && e.data?.type === "MIC_MAXIMIZER_READY") {
+      hookReady = true;
+      sync();
+      heartbeat();
+    }
   });
 
   EXT.storage.onChanged.addListener((changes, area) => {
@@ -45,10 +81,6 @@ const EXT = globalThis.browser ?? globalThis.chrome;
   });
 
   setInterval(sync, 4000);
+  setInterval(heartbeat, 5000);
   sync();
 })();
-
-
-setInterval(() => {
-  EXT.runtime.sendMessage({ type: "MICMAX_HEARTBEAT" }).catch(() => {});
-}, 5000);
