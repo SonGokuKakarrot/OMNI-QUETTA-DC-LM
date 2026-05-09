@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "OMNI VC Mic Maximizer",
-  "version": "2.0.0",
+  "name": "Nocturnal Omni Mic Maximizer",
+  "version": "2.1.0",
   "description": "Boosts microphone input inside Discord Web with page-context WebRTC hook, DSP chain, and aggressive loudness controls.",
   "permissions": [
     "storage",
