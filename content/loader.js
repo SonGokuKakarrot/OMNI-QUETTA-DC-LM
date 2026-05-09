@@ -1,6 +1,5 @@
-const EXT = globalThis.browser ?? globalThis.chrome;
-
 (() => {
+  const EXT = globalThis.browser ?? globalThis.chrome;
   const injectorUrl = EXT.runtime.getURL("core/injector.js");
 
   function inject() {
@@ -19,7 +18,6 @@ const EXT = globalThis.browser ?? globalThis.chrome;
     s.onload = () => {
       document.documentElement.dataset.micMaxLoaderInjected = "1";
       window.__micMaxLoaderBusy = false;
-      EXT.runtime.sendMessage({ type: "MICMAX_HEARTBEAT" }).catch(() => {});
     };
     s.onerror = () => { window.__micMaxLoaderBusy = false; };
     (document.head || document.documentElement).appendChild(s);
