@@ -1,15 +1,18 @@
 {
   "manifest_version": 2,
-  "name": "Nocturnal Omni Mic Maximizer",
-  "version": "2.1.0",
-  "description": "Boosts microphone input inside Discord Web with page-context WebRTC hook, DSP chain, and aggressive loudness controls.",
+  "name": "Omni DC Lord",
+  "short_name": "DC Lord",
+  "version": "3.0.0",
+  "description": "Discord Web voice-channel microphone maximizer for Android extension browsers, with page-context WebRTC hooks, live DSP controls, and a polished control panel.",
   "permissions": [
     "storage",
+    "tabs",
     "https://discord.com/*",
     "https://*.discord.com/*"
   ],
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["background.js"],
+    "persistent": false
   },
   "content_scripts": [
     {
@@ -19,20 +22,21 @@
       ],
       "js": ["content/loader.js", "content/service.js"],
       "run_at": "document_start",
-      "all_frames": true
+      "all_frames": true,
+      "match_about_blank": true
     }
   ],
   "web_accessible_resources": [
     "core/injector.js"
   ],
   "browser_action": {
-    "default_title": "Mic Maximizer",
+    "default_title": "Omni DC Lord",
     "default_popup": "popup/popup.html"
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "discord-vc-mic-maximizer@example.com",
-      "strict_min_version": "142.0",
+      "id": "omni-dc-lord@example.com",
+      "strict_min_version": "109.0",
       "data_collection_permissions": {
         "required": ["none"],
         "optional": []
